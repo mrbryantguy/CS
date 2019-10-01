@@ -1,7 +1,12 @@
-// Bryant Hernandez
-// 09/18/2019
+import org.w3c.dom.Node;
+
+// 09/29/2019
 // CS272
 
+/** Represents a linked list.
+ * @author Bryant Hernandez
+ * @version 1.0
+ */
 public class IntNode {
 
 	// instance variables
@@ -14,31 +19,47 @@ public class IntNode {
 		link = null;
 	} // end no-argument constructor
 	
-	// constructor w/ given
+	/** Creates an IntNode linked list with given parameters
+	 * 
+	 * @param _data The nodes integer value
+	 * @param _node The nodes link
+	 */
 	public IntNode( int _data, IntNode _node ) {
 		data = _data;
 		link = _node;
 	} // end constructor
 	
-	// get and set methods for: 
-		// node value 
+	// get and set methods: 
+		/** Get the nodes value
+		 * @return Integer value of the node
+		 */
 		public int getNode() {
 			return data;
 		}
+		/** Set the nodes value
+		 * @param _data Integer which will be set as the nodes data
+		 */
 		public void setNode(int _data ) {
 			data = _data;
 		}
 	
-		// node link
+		/** Get the nodes link
+		 * @return Link of the current node
+		 */
 		public IntNode getLink() {
 			return link;
 		}
+		/** Set the nodes link
+		 * @param _node Link which will be set as the link of the current node
+		 */
 		public void setLink( IntNode _node ) {
 			link = _node;
 		}
 	
-	// toString method which returns a String for the linked list 
-	// starting from the node that activates this method
+	/** Creates string for the linked list starting from the node that activates
+	 * 
+	 * @return String representation of the linked list
+	 */
 	public String toString() {
 		String s = "";
 		
@@ -52,20 +73,26 @@ public class IntNode {
 		return s;
 	} // end toString
 	
-	// method to add a node after the current node
+	/** Method to add a node after the current node
+	 * 
+	 * @param newdata Integer which will be added to a new node on the linked list
+	 */
 	public void addNodeAfterThis( int newdata ) {
 		link = new IntNode( newdata, link );
 	} // end add node
 	
-	// a method to remove the node after the current node
+	// Method to remove the node after the current node
 	public void removeNodeAfterThis() {
 		if ( link != null ) {
 			link = link.link;
 		} // end precondition
 	} // end remove node
 	
-	// method to get the number of nodes in the list starting from
-	// a given node head
+	/** Method to get the number of nodes in the list starting from a given node head
+	 * 
+	 * @param head Determines where method will begin counting
+	 * @return Integer value representing the length of linked list
+	 */
 	public static int listLength( IntNode head ) {
 		int answer = 0;
 		for (IntNode cursor = head; cursor != null; cursor = cursor.link) {
@@ -74,9 +101,12 @@ public class IntNode {
 		return answer;
 	} // end node length
 	
-	// method to search whether a linked list contains a given value data
-	// returns true if data exists in the linked list starting w/ head
-	// returns false otherwise
+	/** Method to search whether a linked list contains a given value data
+	 * 
+	 * @param head Determines where the method will begin searching
+	 * @param data Integer value being searched for
+	 * @return True if data does exist in list, false if otherwise
+	 */
 	public static boolean search( IntNode head, int data ) {
 		boolean answer = false;
 		if ( head != null ) {
@@ -91,6 +121,107 @@ public class IntNode {
 		} // end precondition
 		return answer;
 	} // end search
+	
+	// method to calculate the number of even elements in the linked list starting from the given head
+	public static int listEvenNumber( IntNode head ) {
+		if( head == null )
+			return 0;
+		
+		int eCnt = 0;
+		for( IntNode cursor = head; cursor != null; cursor = cursor.link ) {
+			if( cursor.data % 2 == 0 )
+				eCnt++;
+		} // end for
+		return eCnt;		
+	} // end listEvenNumber
+	
+	// method to add the given newdata to the end of the linked list that starts from the current node
+	public void addToEnd( int newdata ) {		
+		if( link == null )
+			link = new IntNode( newdata, null );
+		else {
+			IntNode current = link;
+			while( current.link != null ) {
+				current = current.link;
+			} // end while
+			IntNode newNode = new IntNode( newdata, null );
+			current.link = newNode;
+		} // end else
+	} // end addToEnd
+	
+	// method to calculate the summation of elements in the last num nodes in a given linked list
+	public static int sumLast( IntNode head, int num ) {
+		
+		int sum = 0;
+		// when num is bigger than the number of nodes in the list, it should return the summation of elements in all the nodes
+		IntNode cursor = head;
+		if( num > listLength(head) )
+			num = listLength(head);
+		for( int i = 1; i <= num; i++ ) {
+			if( cursor != null ) {
+				sum = sum + cursor.data;
+				cursor = cursor.link;
+			} // end if
+		} // end for
+		return sum;
+		
+	} // end sumLast
+	
+	// copy part of a given linked list
+	public static IntNode copyOdd( IntNode head ) {
+		
+		// if head is not null, method should copy all the odd elements in the linked list starting from
+		// the given head, create a new linked list with all these odd numbers, and return the linked list with the new head
+		if( head != null ) {
+			IntNode odd = new IntNode();
+			for( IntNode cursor = head; cursor != null; cursor = cursor.link ) {
+				if( (cursor.data % 2) != 0 ) {
+					if( cursor == head )
+						odd.setNode(cursor.data);
+					else
+						odd.addNodeAfterThis(cursor.data);
+				} // end if
+			} // end for
+			return odd;
+		} // end if
+		return null;
+	} // end copyOdd
+	
+	// method to remove ALL the nodes that have the data value e from the linked list starting from the given head
+	// method should return the linked list with the new head
+	public static IntNode removeAll( IntNode head, int e ) {
+		
+		if( head != null ) {
+			for( IntNode cursor = head; cursor != null; cursor = cursor.link ) {
+				if( cursor.link.data == e )
+					cursor.removeNodeAfterThis();
+			} // end for
+			return head;
+		} // end if
+		
+		return null;		
+	} // end removeAll
+	
+	// 6 method to reverse a linked list
+	public static IntNode reverse( IntNode head ) {
+		
+		// method should return the linked list with the new head
+		
+	} // end reverse
+	
+	// 7 method to test whether a linked list starting from the given head is cyclic or acyclic
+	public static boolean hasCycle( IntNode head ) {
+		
+		// should return true if it is cyclic
+		// otherwise should return false if the list is acyclic
+		// do NOT modify the list content in any way
+		
+	} // end hadCycle
+	
+	// 8 Implement IntNodeAdvancedTest.java with test cases to test all the above methods in
+	// IntNode.java.
+	// implement a main() method to thoroughly test all the methods in IntNode.java. Design test
+	// cases, put them in your main method, run your program through the test cases.
 	
 	// main method to test all methods
 	public static void main ( String args[] ) {
@@ -161,6 +292,50 @@ public class IntNode {
 			System.out.println("87 was found in list2");
 		else
 			System.out.println("87 was NOT found in list2");
+		
+		// test listEvenNumber method
+		System.out.println("\nTesting listEvenNumber method on list1...");
+		if( listEvenNumber(list1) < 2 )
+			System.out.println("There is " + listEvenNumber(list1) + " even number in list1.");
+		else
+			System.out.println("There are " + listEvenNumber(list1) + " even numbers in list1.");
+		
+		System.out.println("\nTesting listEvenNumber method on list2...");
+		if( listEvenNumber(list2) < 2 )
+			System.out.println("There is " + listEvenNumber(list2) + " even number in list2.");
+		else
+			System.out.println("There are " + listEvenNumber(list2) + " even numbers in list2.");
+		
+		// test addToEnd
+		System.out.println("\nTesting addToEnd on both list1 and list2...");
+		list1.addToEnd( 88 );
+		list2.addToEnd( 88 );
+		System.out.println(list1.toString());
+		System.out.println(list2.toString());
+		
+		// test sumLast
+		System.out.println("\nTesting sumLast on both list1 and list2...");
+		System.out.println(list1.toString());
+		System.out.println("The sum of list1 is " + sumLast(list1, 7) + ".");
+		System.out.println(list2.toString());
+		System.out.println("The sum of list2 is " + sumLast(list2, 7) + ".");
+		
+		// test copyOdd
+		System.out.println("\nTesting copyOdd method...");
+		System.out.println("The odd elements in list1 are " + copyOdd(list1).toString());
+		System.out.println("The odd elements in list2 are " + copyOdd(list2).toString());
+		
+		// test removeAll
+		System.out.println("\nTesting removeAll on new list list3...");
+		IntNode list3 = new IntNode( 50, null );
+		list3.addNodeAfterThis(14);
+		list3.addNodeAfterThis(50);
+		list3.addNodeAfterThis(35);
+		list3.addNodeAfterThis(50);
+		list3.addNodeAfterThis(76);
+		System.out.println(list3.toString());
+		list3.removeAll(list3, 50);
+		System.out.println(list3.toString());
 		
 	} // end main
 	
