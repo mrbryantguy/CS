@@ -1,5 +1,3 @@
-import org.w3c.dom.Node;
-
 // 09/29/2019
 // CS272
 
@@ -192,11 +190,16 @@ public class IntNode {
 	public static IntNode removeAll( IntNode head, int e ) {
 		
 		if( head != null ) {
+			IntNode newInNo = null;
 			for( IntNode cursor = head; cursor != null; cursor = cursor.link ) {
-				if( cursor.link.data == e )
-					cursor.removeNodeAfterThis();
+				if( newInNo == null ) {
+					if( cursor.data != e )
+						newInNo = new IntNode( cursor.data, null );
+				} // end if
+				else if( cursor.data != e )
+					newInNo.addNodeAfterThis( cursor.data );
 			} // end for
-			return head;
+			return newInNo;
 		} // end if
 		
 		return null;		
@@ -334,7 +337,7 @@ public class IntNode {
 		list3.addNodeAfterThis(50);
 		list3.addNodeAfterThis(76);
 		System.out.println(list3.toString());
-		list3.removeAll(list3, 50);
+		removeAll(list3, 50);
 		System.out.println(list3.toString());
 		
 	} // end main
