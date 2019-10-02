@@ -1,9 +1,9 @@
-// 09/29/2019
+// 10/1/2019
 // CS272
 
 /** Represents a linked list.
  * @author Bryant Hernandez
- * @version 1.0
+ * @version 2.0
  */
 public class IntNode {
 
@@ -174,7 +174,7 @@ public class IntNode {
 			IntNode odd = new IntNode();
 			for( IntNode cursor = head; cursor != null; cursor = cursor.link ) {
 				if( (cursor.data % 2) != 0 ) {
-					if( cursor == head )
+					if( odd.data == 0 )
 						odd.setNode(cursor.data);
 					else
 						odd.addNodeAfterThis(cursor.data);
@@ -190,14 +190,14 @@ public class IntNode {
 	public static IntNode removeAll( IntNode head, int e ) {
 		
 		if( head != null ) {
-			IntNode newInNo = null;
+			IntNode newInNo = new IntNode();
 			for( IntNode cursor = head; cursor != null; cursor = cursor.link ) {
-				if( newInNo == null ) {
-					if( cursor.data != e )
-						newInNo = new IntNode( cursor.data, null );
+				if( cursor.data != e ) {
+					if( newInNo.data == 0 )
+						newInNo.setNode( cursor.data );
+				    else
+				    	newInNo.addNodeAfterThis( cursor.data );
 				} // end if
-				else if( cursor.data != e )
-					newInNo.addNodeAfterThis( cursor.data );
 			} // end for
 			return newInNo;
 		} // end if
@@ -205,26 +205,40 @@ public class IntNode {
 		return null;		
 	} // end removeAll
 	
-	// 6 method to reverse a linked list
+	// method to reverse a linked list
 	public static IntNode reverse( IntNode head ) {
 		
 		// method should return the linked list with the new head
+		if( head != null ) {
+			IntNode prev = null;
+			IntNode cursor = head;
+			IntNode link = null;
+			while( cursor != null ) {
+				link = cursor.link;
+				cursor.link = prev;
+				prev = cursor;
+				cursor = link;
+			}
+			head = prev;
+			return head;
+		} // end if
+		
+		return null;	
 		
 	} // end reverse
 	
-	// 7 method to test whether a linked list starting from the given head is cyclic or acyclic
+	// method to test whether a linked list starting from the given head is cyclic or acyclic
 	public static boolean hasCycle( IntNode head ) {
-		
+	
+		for( IntNode cursor = head; cursor != null; cursor = cursor.link ) {
+			// otherwise should return false if the list is acyclic
+			if( cursor.link == null )
+				return false;
+		}
 		// should return true if it is cyclic
-		// otherwise should return false if the list is acyclic
-		// do NOT modify the list content in any way
+		return true;
 		
 	} // end hadCycle
-	
-	// 8 Implement IntNodeAdvancedTest.java with test cases to test all the above methods in
-	// IntNode.java.
-	// implement a main() method to thoroughly test all the methods in IntNode.java. Design test
-	// cases, put them in your main method, run your program through the test cases.
 	
 	// main method to test all methods
 	public static void main ( String args[] ) {
@@ -297,13 +311,14 @@ public class IntNode {
 			System.out.println("87 was NOT found in list2");
 		
 		// test listEvenNumber method
-		System.out.println("\nTesting listEvenNumber method on list1...");
+		System.out.println("\nTesting listEvenNumber method...");
+		System.out.println(list1.toString());
 		if( listEvenNumber(list1) < 2 )
 			System.out.println("There is " + listEvenNumber(list1) + " even number in list1.");
 		else
 			System.out.println("There are " + listEvenNumber(list1) + " even numbers in list1.");
-		
-		System.out.println("\nTesting listEvenNumber method on list2...");
+
+		System.out.println(list2.toString());
 		if( listEvenNumber(list2) < 2 )
 			System.out.println("There is " + listEvenNumber(list2) + " even number in list2.");
 		else
@@ -323,22 +338,52 @@ public class IntNode {
 		System.out.println(list2.toString());
 		System.out.println("The sum of list2 is " + sumLast(list2, 7) + ".");
 		
+		System.out.println("\nTesting sumLast with parameter of 2(only the first 2)...");
+		System.out.println(list1.toString());
+		System.out.println("The sum of list1 is " + sumLast(list1, 2) + ".");
+		System.out.println(list2.toString());
+		System.out.println("The sum of list2 is " + sumLast(list2, 2) + ".");
+		
 		// test copyOdd
 		System.out.println("\nTesting copyOdd method...");
+		System.out.println(list1.toString());
 		System.out.println("The odd elements in list1 are " + copyOdd(list1).toString());
+		System.out.println(list2.toString());
 		System.out.println("The odd elements in list2 are " + copyOdd(list2).toString());
 		
-		// test removeAll
-		System.out.println("\nTesting removeAll on new list list3...");
+		// create new IntNode list
 		IntNode list3 = new IntNode( 50, null );
 		list3.addNodeAfterThis(14);
 		list3.addNodeAfterThis(50);
 		list3.addNodeAfterThis(35);
 		list3.addNodeAfterThis(50);
 		list3.addNodeAfterThis(76);
+		
+		// test removeAll
+		System.out.println("\nlist3...");
 		System.out.println(list3.toString());
-		removeAll(list3, 50);
+		System.out.println("\nTesting removeAll on list3 with 50 as the int parameter...");
+		System.out.println(removeAll(list3, 50).toString());
+		
+		// test reverse
+		System.out.println("\nlist2...");
+		System.out.println(list2.toString());
+		System.out.println("\nTesting reverse on list2...");
+		System.out.println(reverse(list2).toString());
+		
+		// test hasCycle
+		System.out.println("\nTesting hasCycle on list1 and list3...");
+		System.out.println(list1.toString());
+		if( hasCycle(list1) )
+			System.out.println("list1 is cyclic.");
+		else
+			System.out.println("list1 is acyclic.");
+		
 		System.out.println(list3.toString());
+		if( hasCycle(list3) )
+			System.out.println("list3 is cyclic.");
+		else
+			System.out.println("list3 is acyclic.");
 		
 	} // end main
 	
