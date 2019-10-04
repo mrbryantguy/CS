@@ -1,10 +1,10 @@
-all: test4
+all: lab5test
 
-test4: lab4.o test4.o
-	gcc lab4.o test4.o -o test4 -lm
+lab5test: lab5functions.o lab5test.o
+	gcc lab5functions.o lab5test.o -o lab5test -lm
 
-test4.o: test4.c lab4.h
-	gcc -c test4.c
+lab5test.o: lab5test.c lab5functions.h
+	gcc -c lab5test.c
 
-lab4.o: lab4.c lab4.h
-	gcc -c lab4.c
+lab5functions.o: lab5functions.c lab5functions.h
+	gcc -c lab5functions.c
