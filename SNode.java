@@ -9,10 +9,7 @@ public class SNode<E>{
 	private SNode<E> link;
 	
 	// no argument constructor 
-	public SNode() {
-		data = null;
-		link = null;
-	} // end constructor
+	public SNode(){ data = null; link = null; }
 	
 	// constructor with parameters
 	public SNode( E _data, SNode<E> _link ) {
@@ -33,5 +30,10 @@ public class SNode<E>{
 		public void setLink( SNode<E> next ) {
 			link = next;
 		} // end setLink
+		
+	// method to add node
+	public void addNodeAfterThis( E newdata ) {
+		link = new SNode( newdata, null );
+	} // end add node
 	
 } // end class

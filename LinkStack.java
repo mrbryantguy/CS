@@ -13,9 +13,8 @@ public class LinkStack<E> implements StackInterface<E>{
 		if( node == null )
 			throw new EmptyStackException();
 		// get reference to top element and remove it from the stack
-		E ans = node.getData();
 		node = node.getLink();
-		return ans;
+		return node.getData();
 	} // end pop
 	
 	public void push(E e) {
