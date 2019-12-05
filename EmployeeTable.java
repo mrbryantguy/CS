@@ -21,30 +21,117 @@ public class EmployeeTable {
 	} // end constructor
 	
 	// hash function
-	public int hashCode(int employee_no) {
-		// hash code of employee no % size_of_array_for_keys
-	} // end hashCode
+	private int hash(Object e) {
+		return Math.abs(e.hashCode()) % keys.length;
+	} // end hash
+	
+	
+	
+	// find index of key
+	private int findIndex(Object e) {
+		int idx = hash(e);
+		int counter = 0;
+		while(counter< data.length && used[idx]) {
+			if(e == keys[idx])
+				return idx;
+			else {
+				idx++; counter++;
+			} // end else
+		} // end while
+		
+		return -1; // can't find search key
+	} // end findIndex
 	
 	// add a new employee, e, into the hash table
 	public void put(Employee e) {
 		
+		// hash table is full (special)
+		
+		// calculate index of employee
+		int idx = findIndex(e);
+		
+		// case 1: employee exists
+		if(idx != -1)
+			data[idx] = e;
+		
+		else { // case 2: employee does not exist
+			idx = hash(e);
+			
+			// loop to next available idx
+			if(keys[idx] != null) {
+				while(used[idx]) {
+					if(idx == used.length-1) {
+						idx = 0;
+					} // end if
+					else
+						idx++;
+				} // end while
+			} // end if
+		
+			keys[idx] = e.getNo();
+			data[idx] = e;
+			used[idx] = true;
+			num++;
+		} // end else
+		
 	} // end put
+	
+	/*public Object get(Object e) {
+		int idx = findIndex(e);
+		// case 1: employee does not exist
+		if(idx == -1)
+			return null;
+		else
+			return e;
+	} // end get*/
 	
 	// remove a given employee with id emp_no from hash table
 	// return false if an employee with emp_no does not exist in the hash table
 	// otherwise, remove it and return true
 	public boolean remove(int emp_no) {
-		
+		int idx = findIndex(emp_no);
+		if(idx == -1)
+			return false;
+		else {
+			keys[idx] = null; data[idx] = null; num--;
+			return true;
+		} // end else
 	} // end remove
 	
 	// find the index of the given employee id emp_no
 	// return the index of the employee in the array if the employee with the given id exists
 	// otherwise return -1
 	public int search(int emp_no) {
-		
+		int idx = findIndex(emp_no);
+		if(idx != -1)
+			return idx;
+		else
+			return -1;
 	} // end search
 	
 	// test cases
+	public static void main(String args[]) {
+		
+		System.out.println("Creating an EmployeeTable group1...");
+		EmployeeTable group1 = new EmployeeTable();
+		
+		System.out.println("Creating a new employee emp1...");
+		Employee emp1 = new Employee();
+		emp1.setName("Rick Sanchez"); emp1.setAge(55); emp1.setNo(137); emp1.setState("TX"); emp1.setZip(80501);
+
+		// add employee to employee table
+		System.out.println("Adding emp1 to group1 using put method...");
+		group1.put(emp1);
+		
+		// test search
+		System.out.println("\nSearching for employee with no. 137 in group1...");
+		int idx = group1.search(137);
+		if(idx != -1)
+			System.out.println("Employee was found at index " + idx + ".");
+		else
+			System.out.println("Employee was not found in the table.");
+		
+	} // end main
 	
 	// HashMap java class implements hash table
 	// design main function to utilize functions of this data structure
