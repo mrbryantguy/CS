@@ -1,10 +1,10 @@
-all: lab5test
+all: Lab10
 
-lab5test: lab5functions.o lab5test.o
-	gcc lab5functions.o lab5test.o -o lab5test -lm
+Lab10: Term.o Lab10.o
+	g++ Term.o Lab10.o -o Lab10
 
-lab5test.o: lab5test.c lab5functions.h
-	gcc -c lab5test.c
+Term.o: Term.cpp Term.h
+	g++ -c Term.cpp
 
-lab5functions.o: lab5functions.c lab5functions.h
-	gcc -c lab5functions.c
+Lab10.o: Lab10.cpp Term.h
+	g++ -c Lab10.cpp
