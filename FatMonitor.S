@@ -10,237 +10,195 @@
     .global age
     .comm fat, 1
     .global fat
+    .comm bvector, 1
+    .global bvector
 
 #
 # Program code (lightup function)
 #
     .text
     .global lightup
+    
 lightup:
 
   
-  lds  R16, gender
-  CPI  R16, 1
-  BRLO  female
+  LDS  r16, gender
+  CPI  r16, 0x01
+  BREQ  female
 
   ;; we are male
-  jmp male
+  JMP male
 
 female:
+    lds r17, age ;; load age
 
-    lds R17, age
-    
-    CPI  R17, 40
-    BRMI  f20  ;; branch to handle f20s
-    CPI  R17, 60
-    BRMI  f40
-    CPI  R17, 80
-    BRMI  f60
-
-    ;; we are over 79
-    ldi  r18, 0
-    sts bvector, r18
+    cpi  r17, 40
+    brlo  f20
+    cpi  r17, 60
+    brlo  f40
+    cpi  r17, 80
+    brlo  f60
+    ;; we are 80 or older
+    ldi  r18, 0b0
+    sts  bvector, r18
     jmp lights
 
-f20:    ;; female 20 to 39
+f20:    ;; female 20 to 40
+    lds r19, fat  ;; load fat
 
-    lds r19, fat
-
-    ;; handle very high fat
     CPI  R19, 21
-    BRMI  f20low ;; branch to handle 
+    BRLO  m20low  ;; branch to handle low fat m20
     CPI  R19, 33
-    BRMI  f20normal
+    BRLO  m20normal
     CPI  R19, 39
-    BRMI  f20high
+    BRLO  m20high
     ;; we are extra fat
-    ldi  r18, 0  ;; don't blink when extra fat
-    STS  BLINK, r18
-    LDI  R18, 0b00110001
-    STS  BVECTOR, R18
+    ldi  r21, 0  ;; don't BLINK when extra fat
+    LDI  R18, 0b00110001  ;; (all lights)
+    sts  bvector,r18
     jmp  lights
 
-f20low:   ;; we are female 20 to 39 low fat
-    ldi  r18, 0b00100000
-    sts  BVECTOR, r18
-    jmp  lights
-    
-f20normal:    ;; we are female 20 to 39 normal fat
-    ldi  r18, 0b00010000
-    sts  BVECTOR, r18
-    jmp lights
+f40:    ;; female 40 to 60
+    lds r19, fat  ;; load fat
 
-f20high:    ;; we are female 20 to 39 high fat
-    ldi  r18, 0b00110001
-    sts  BVECTOR, r18
-    jmp  lights
-
-f40:    ;; female 40 to 59
-
-    lds r19, fat
-
-    ;; handle very high fat
     CPI  R19, 23
-    BRMI  f40low ;; branch to handle 
+    BRLO  m20low  ;; branch to handle low fat m20
     CPI  R19, 34
-    BRMI  f40normal
+    BRLO  m20normal
     CPI  R19, 40
-    BRMI  f40high
+    BRLO  m20high
     ;; we are extra fat
-    ldi  r18, 0  ;; don't blink when extra fat
-    STS  BLINK, r18
-    LDI  R18, 0b00110001
-    STS  BVECTOR, R18
+    ldi  r21, 0  ;; don't BLINK when extra fat
+    LDI  R18, 0b00110001  ;; (all lights)
     jmp  lights
 
-f40low:   ;; we are female 40 to 59 low fat
-    ldi  r18, 0b00100000
-    sts  BVECTOR, r18
-    jmp  lights
-    
-f40normal:    ;; we are female 40 to 59 normal fat
-    ldi  r18, 0b00010000
-    sts  BVECTOR, r18
-    jmp lights
+f60:    ;; female 60 to 80
+    lds r19, fat  ;; load fat
 
-f40high:    ;; we are female 40 to 59 high fat
-    ldi  r18, 0b00110001
-    sts  BVECTOR, r18
-    jmp  lights
-
-f60:    ;; female 60 to 79
-
-    lds r19, fat
-
-    ;; handle very high fat
     CPI  R19, 24
-    BRMI  f60low ;; branch to handle 
+    BRLO  m20low  ;; branch to handle low fat m20
     CPI  R19, 36
-    BRMI  f60normal
+    BRLO  m20normal
     CPI  R19, 42
-    BRMI  f60high
+    BRLO  m20high
     ;; we are extra fat
-    ldi  r18, 0  ;; don't blink when extra fat
-    STS  BLINK, r18
-    LDI  R18, 0b00110001
-    STS  BVECTOR, R18
+    ldi  r21, 0  ;; don't BLINK when extra fat
+    LDI  R18, 0b00110001  ;; (all lights)
     jmp  lights
 
-f60low:   ;; we are female 60 to 79 low fat
-    ldi  r18, 0b00100000
-    sts  BVECTOR, r18
-    jmp  lights
-    
-f60normal:    ;; we are female 60 to 79 normal fat
-    ldi  r18, 0b00010000
-    sts  BVECTOR, r18
+male:
+    LDS  r17, age  ;; load age
+
+    CPI  r17, 40
+    BRLO  m20
+    CPI  r17, 60
+    BRLO  m40
+    CPI  r17, 80
+    BRLO  m60
+    ;; we are 80 or older
+    ldi  r18, 0b0
+    sts  bvector, r18
     jmp lights
 
-f60high:    ;; we are female 60 to 79 high fat
-    ldi  r18, 0b00110001
-    sts  BVECTOR, r18
-    jmp  lights
 
-m20:    ;; male 20 to 39
+m20:    ;; male 20 to 40
 
-    lds r19, fat
+    lds r19, fat  ;; load fat
 
-    ;; handle very high fat
-    CPI  R19, 8
-    BRMI  m20low ;; branch to handle 
+    CPI  R19, 8  
+    BRLO  m20low  ;; branch to handle low fat m20
     CPI  R19, 20
-    BRMI  m20normal
+    BRLO  m20normal
     CPI  R19, 25
-    BRMI  m20high
+    BRLO  m20high
     ;; we are extra fat
-    ldi  r18, 0  ;; don't blink when extra fat
-    STS  BLINK, r18
-    LDI  R18, 0b00110001
-    STS  BVECTOR, R18
+    ldi  r21, 0  ;; don't BLINK when extra fat
+    LDI  R18, 0b00110001  ;; (all lights)
     jmp  lights
 
-m20low:   ;; we are male 20 to 39 low fat
+m20low:   ;; we are male 20 to 40 low fat (blue light)
     ldi  r18, 0b00100000
-    sts  BVECTOR, r18
+    sts  bvector, r18
+    ldi    r21, 30    ;; loads the number of blinks
     jmp  lights
     
-m20normal:    ;; we are male 20 to 39 normal fat
+m20normal:    ;; we are male 20 to 40 normal fat (green light)
     ldi  r18, 0b00010000
-    sts  BVECTOR, r18
+    sts  bvector, r18
+    ldi    r21, 30
     jmp lights
 
-m20high:    ;; we are male 20 to 39 high fat
-    ldi  r18, 0b00110001
-    sts  BVECTOR, r18
+m20high:    ;; we are male 20 to 40 high fat (red light)
+    ldi  r18, 0b00000001
+    sts  bvector, r18
+    ldi  r21, 30
     jmp  lights
 
-m40:    ;; male 40 to 59
+m40:    ;; male 40 to 60
 
-    lds r19, fat
-
-    ;; handle very high fat
-    CPI  R19, 11
-    BRMI  m40low ;; branch to handle 
+    lds  r19, fat  ;; load fat
+    
+    CPI  R19, 11  
+    BRLO  m20low  ;; branch to m20
     CPI  R19, 22
-    BRMI  m40normal
+    BRLO  m20normal
     CPI  R19, 28
-    BRMI  m40high
+    BRLO  m20high
     ;; we are extra fat
-    ldi  r18, 0  ;; don't blink when extra fat
-    STS  BLINK, r18
+    LDI  r21, 0
     LDI  R18, 0b00110001
-    STS  BVECTOR, R18
-    jmp  lights
-
-m40low:   ;; we are male 40 to 59 low fat
-    ldi  r18, 0b00100000
-    sts  BVECTOR, r18
-    jmp  lights
-    
-m40normal:    ;; we are male 40 to 59 normal fat
-    ldi  r18, 0b00010000
-    sts  BVECTOR, r18
     jmp lights
 
-m40high:    ;; we are male 40 to 59 high fat
-    ldi  r18, 0b00110001
-    sts  BVECTOR, r18
-    jmp  lights
+m60:    ;; male 60 to 80
 
-m60:    ;; male 60 to 79
+    lds  r19, fat  ;; load fat
 
-    lds r19, fat
-
-    ;; handle very high fat
-    CPI  R19, 13
-    BRMI  m60low ;; branch to handle 
+    CPI  R19, 13  
+    BRLO  m20low  ;; branch to m20
     CPI  R19, 25
-    BRMI  m60normal
+    BRLO  m20normal
     CPI  R19, 30
-    BRMI  m60high
+    BRLO  m20high
     ;; we are extra fat
-    ldi  r18, 0  ;; don't blink when extra fat
-    STS  BLINK, r18
+    LDI  r21, 0
     LDI  R18, 0b00110001
-    STS  BVECTOR, R18
-    jmp  lights
-
-m60low:   ;; we are male 60 to 79 low fat
-    ldi  r18, 0b00100000
-    sts  BVECTOR, r18
-    jmp  lights
-    
-m60normal:    ;; we are male 60 to 79 normal fat
-    ldi  r18, 0b00010000
-    sts  BVECTOR, r18
     jmp lights
-
-m60high:    ;; we are male 60 to 79 high fat
-    ldi  r18, 0b00110001
-    sts  BVECTOR, r18
-    jmp  lights
     
 lights:
-  out 0x04, R18   ; 0x04 is I/O address of DDRB
-  out 0x05, R18   ; 0x05 is I/O address of PORTB
-  ret
+      cpi  r21, 1
+      brlo  noblink
+      lds  r18, bvector
+      out  0x04, r18  ;; I/O of DDRB, sets the direction
+all:  lds  r18, bvector
+      out  0x05, r18  ;; I/O of PORTB, sends flow
+      ldi    r19, 0xff
+dl1:  ldi    r20, 0xff
+dl2:  nop
+      nop
+      nop
+      nop
+      dec    r20
+      brne   dl2
+      dec    r19
+      brne   dl1
+      ldi    r18, 0x00
+      out    0x05, r18
+      ldi    r19, 0xff
+dl3:  ldi    r20, 0xff
+dl4:  nop
+      nop
+      nop
+      nop
+      dec    r20
+      brne   dl4
+      dec    r19
+      brne   dl3
+      dec    r22
+      dec    r21
+      brne   all
+      ret
+
+noblink:
+    out  0x04, r18
+    out  0x05, r18
+    ret
