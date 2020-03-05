@@ -13,10 +13,10 @@
 ;;  to figure out which segment is desired 
 ;;; and which sequence is needed
 ;;
-;;  Since our setup utilizes PORTB and PORTB, then we need to main
+;;  SINCe our setup utilizes PORTB and PORTB, then we need to main
 ;;   simulataneous vectors for all of the segment sequences that are neededed
 ;;
-;; main routine does
+;; main rOUTine does
 ;;   setup_ports once
 ;; 
 ;;   C code to do the following
@@ -24,8 +24,45 @@
 ;;   segment=0
 ;;   digit=9
 ;;   display_segment();; will display 9 on segment 0, for example
-;;  
+  
   .data
+  .macro pushall
+  push r16
+  push r17
+  push r18
+  push r19
+  push r20
+  push r21
+  push r22
+  push r23
+  push r24
+  push r25
+  push r26
+  push r27
+  push r28
+  push r29
+  push r30
+  push r31
+  .endm ; of pushall
+
+  .macro popall
+  pop r31
+  pop r30
+  pop r29
+  pop r28
+  pop r27
+  pop r26
+  pop r25
+  pop r24
+  pop r23
+  pop r22
+  pop r21
+  pop r20
+  pop r19
+  pop r18
+  pop r17
+  pop r16
+  .endm ; of popall
   .size segment_table, 4
   .size portb_table, 10
   .size portd_table, 10
@@ -37,9 +74,8 @@ portb_table:  # list of binary sequences for setting port B to be ORed with segm
     .byte  0,0,1,1,1,1,1,0,1,1
     ;;     0,1,2,3,4,5,6,7,8,9
 portd_table: # list of binary sequences for setting port D. (0-7)
-    .byte  0b1111100,0b00011000,0b01101100,0b00111100,0b10011000,0b10110100,0b11110100,0b00011100,0b11111100, 0b10111100
-    ;;     0         1          2          3          4          5          6          7          8           9
-segmentv: .byte 1
+    .byte  0b11111100,0b00011000,0b01101100,0b00111100,0b10011000,0b10110100,0b11110100,0b00011100,0b11111100, 0b10111100
+    ;;     0          1          2          3          4          5          6          7          8           9
 
   
   .comm segment, 1 ;; the common name for segment
@@ -53,101 +89,59 @@ segmentv: .byte 1
   .global setup_ports
   .global display_segment
 
+  
 
+setup_ports:  ;; rOUTine to set the ports into OUTput mode
 
-setup_ports:  ;; routine to set the ports into output mode
+  LDI  r16, 0x1F // for digital pins 8-12
+  OUT  0x04, r16 // DDRB
+  OUT  0x05, r16 // PORTB
 
-  ldi  r16, 0x1F // for digital pins 8-12
-  out  0x04, r16 // DDRB
-  out  0x05, r16 // PORTB
-
-  ldi  r16, 0xFC // for digital pins 2-7
-  out  0x0A, r16 // DDRD
-  out  0x0B, r16 // PORTD
+  LDI  r16, 0xFC // for digital pins 2-7
+  OUT  0x0A, r16 // DDRD
+  OUT  0x0B, r16 // PORTD
   
   ret ;; of setup_ports
 
 
 
 display_segment:  ;;  main entry point for setting the segment
+   pushall
 
    ;; the goal is the use "digit" and "segment" to find the values that need to be sent to PORTB and PORT D 
 
-   //LDI R31, hi8(segment_table) ; initialize high byte of Z
-   //LDI R30, lo8(segment_table) ; initialize low byte of Z
+   LDI R31, hi8(segment_table) ; initialize high byte of Z
+   LDI R30, lo8(segment_table) ; initialize low byte of Z
    LDI R29, hi8(portb_table) ; initialize high byte of Y
    LDI R28, lo8(portb_table) ; initialize low byte of Y
    LDI R27, hi8(portd_table) ; initialize high byte of X
    LDI R26, lo8(portd_table) ; initialize low byte of X
+   LDI  r23, 0 // for segcheck
+   LDI r19, 0 // for digcheck
 
-   digcheck:
-     ld  r20, x+ ;; portd table
-     ld  r21, y+ ;; portb for 8
-     // ld  r22, z+ ;; segment table
-     lds  r17, digit
-     lds  r16, segment
+digcheck:
+   LD  r20, X+ ;; portd table
+   LD  r21, Y+ ;; portb for 8
+   LDS  r17, digit ;; digit to be outputted
 
-     cpi  r17, 0
-     breq  lightnum
-     jmp digcheck
-     cpi  r17, 1
-     breq  lightnum
-     jmp digcheck
-     cpi  r17, 2
-     breq  lightnum
-     jmp digcheck
-     cpi  r17, 3
-     breq  lightnum
-     jmp digcheck
-     cpi  r17, 4
-     breq  lightnum
-     jmp digcheck
-     cpi  r17, 5
-     breq  lightnum
-     jmp digcheck
-     cpi  r17, 6
-     breq  lightnum
-     jmp digcheck
-     cpi  r17, 7
-     breq  lightnum
-     jmp digcheck
-     cpi  r17, 8
-     breq  lightnum
-     jmp digcheck
-     cpi  r17, 9
-     breq  lightnum
+   CP  r17, r19 ;; compare the digit to r19
+   BREQ  segcheck ;; if equal, then we must compare the segment
+   INC  r19
+   JMP digcheck
 
-lightnum:
-     out  0x0B, r20 ;; out for PORTD
-     cpi  r16, 0
-     BREQ  seg0
-     cpi  r16, 1
-     BREQ  seg1
-     cpi  r16, 2
-     BREQ  seg2
-     jmp  seg3
-     ret
+segcheck:
+    
+   LD  r22, z+ ;; segment table
+   LDS  r16, segment ;; segment from C
+   
+   CP  r16, r23
+   BREQ  lightup
+   INC  r23
+   jmp  segcheck
 
-seg0:
-    ldi  r16, 0b00011100
-    add  r16, r21
-    out  0x05, r16
-    ret
-
-seg1:
-    ldi  r16, 0b00011010
-    add  r16, r21
-    out  0x05, r16
-    ret
-
-seg2:
-    ldi  r16, 0b00010110
-    add  r16, r21
-    out  0x05, r16
-    ret
-
-seg3:
-    ldi  r16, 0b00001110
-    add  r16, r21
-    out  0x05, r16
-    ret
+lightup:
+   ADD  r22, r21
+   OUT  0x05, r22 ;; out for PORTB (8-15) segment
+   OUT  0x0B, r20 ;; out for PORTD (0-7)  number
+   popall
+   ret

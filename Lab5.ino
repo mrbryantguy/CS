@@ -34,6 +34,7 @@ void setup() {
 }
 
 void loop() {
+  
   segment=0;
   digit=0;
   display_segment();
@@ -54,7 +55,7 @@ void loop() {
   display_segment();
   delay(1000);
 
-   segment=0;
+  segment=0;
   digit=4;
   display_segment();
   delay(1000);
@@ -83,4 +84,5 @@ void loop() {
   digit=9;
   display_segment();
   delay(1000);
+  
 } // end loop
